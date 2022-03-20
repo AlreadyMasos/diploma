@@ -12,7 +12,7 @@ counter = 0
 stage = None
 pTime = 0
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-    cap = cv2.VideoCapture('testvideocurls.mp4')
+    cap = cv2.VideoCapture(0)
     while cap.isOpened():
         ret, frame = cap.read()
         
