@@ -9,6 +9,7 @@ mp_pose = mp.solutions.pose
 helper = counter_class.AngleCounter
 counter = 0
 stage = None
+stage_knee = None
 
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
     cap = cv2.VideoCapture(0)
@@ -25,26 +26,45 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
         try:
             landmarks = results.pose_landmarks.landmark
-            knee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
-                        landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
-
-            hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
-                    landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
-
-            ankle = [landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,
-                    landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y]
             
-            angle = helper.calculate_angle(hip,knee,ankle)
-            cv2.putText(image, str(round(angle)), 
-                           tuple(np.multiply(hip, [640, 480]).astype(int)), 
+            knee_left = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+
+            hip_left = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                            landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+
+            ankle_left = [landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,
+                            landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y]
+
+            knee_right = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+
+            hip_right = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                            landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+
+            ankle_right = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,
+                            landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y]
+            
+            angle_knee_left = helper.calculate_angle(hip_left,
+                                                    knee_left,
+                                                    ankle_left)
+                    
+            angle_knee_right = helper.calculate_angle(hip_right,
+                                                    knee_right,
+                                                    ankle_right)
+            cv2.putText(image, str(round(angle_knee_left)), 
+                           tuple(np.multiply(hip_left, [640, 480]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 10), 2, cv2.LINE_AA
                                 )
 
-            if angle > 160:
-                stage = 'down'
-            if angle <= 105 and stage == 'down':
-                stage = 'up'
-                counter += 1
+        
+            if angle_knee_left > 160 and angle_knee_right > 160:
+                    stage_knee = 'down'
+                    starter = hip_left[1]
+            if (angle_knee_left <= 130 and angle_knee_right <= 130
+                    and stage_knee == 'down' and hip_left[1] >= starter + 0.1):
+                    stage_knee = 'up'
+                    counter += 1
                 
         except:
             pass
@@ -76,4 +96,3 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
     cap.release()
     cv2.destroyAllWindows()
-print(counter)

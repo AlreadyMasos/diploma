@@ -36,10 +36,6 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                     landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
             
             angle = helper.calculate_angle(shoulder,elbow,wrist)
-            cv2.putText(image, str(round(angle)), 
-                           tuple(np.multiply(elbow, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 10), 2, cv2.LINE_AA
-                                )
             
             if angle > 160:
                 stage = 'down'
@@ -50,6 +46,10 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                 stage = 'up'
                 counter += 1
                 print(shoulder,'up')
+            cv2.putText(image, str(round(angle)), 
+                           tuple(np.multiply(elbow, [640, 480]).astype(int)), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 10), 2, cv2.LINE_AA
+                                )
         except:
             pass
         #cv2.rectangle(image, (0,0), (225,73), (245,117,16), -1)
