@@ -12,7 +12,7 @@ counter = 0
 stage = None
 pTime = 0
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('file_16.MOV')
     while cap.isOpened():
         ret, frame = cap.read()
         
@@ -26,28 +26,36 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
         try:
             landmarks = results.pose_landmarks.landmark
-            shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
-                        landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+            shoulder_l = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                          landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
 
-            elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
-                    landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+            elbow_l = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                       landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
 
-            wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
-                    landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+            wrist_l = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                       landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+
+            shoulder_r = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                          landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+
+            elbow_r = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                       landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+
+            wrist_r = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                       landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
             
-            angle = helper.calculate_angle(shoulder,elbow,wrist)
+            angle = helper.calculate_angle(shoulder_l, elbow_l, wrist_l)
             
             if angle > 160:
                 stage = 'down'
-                startp = shoulder[0]
-                print(startp,'start')
-            if angle < 100 and stage == 'down' and shoulder[0] <= startp - 0.01:
-                print(shoulder[0])
+                startp = shoulder_l[1]
+                print(startp, 'start')
+            if angle < 100 and stage == 'down' and shoulder_l[1] >= startp + 0.15:
                 stage = 'up'
                 counter += 1
-                print(shoulder,'up')
+                print(shoulder_l[1], 'up')
             cv2.putText(image, str(round(angle)), 
-                           tuple(np.multiply(elbow, [640, 480]).astype(int)), 
+                           tuple(np.multiply(elbow_lq, [640, 480]).astype(int)),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 10), 2, cv2.LINE_AA
                                 )
         except:

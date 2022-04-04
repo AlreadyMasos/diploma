@@ -38,13 +38,13 @@ def pushups(update,context):
         pushups_counter))"""
 
 def show_users(update,context):
-    with sq.connect('alldata.db') as con:
+    with sq.connect('database/alldata.db') as con:
         cur = con.cursor()
         b = cur.execute('''SELECT user_name FROM USERS''').fetchall()
         update.message.reply_text(b, update.message.chat.id)
 
 def add_user(update,context):
-    with sq.connect('alldata.db') as con:
+    with sq.connect('database/alldata.db') as con:
         cur = con.cursor()
         b = cur.execute('''INSERT INTO users VALUES (?,?)''')
         

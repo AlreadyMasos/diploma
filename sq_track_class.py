@@ -2,7 +2,8 @@ import cv2
 import numpy as np 
 import mediapipe as mp
 import counter_class
-import time
+
+
 def all_track(filename):
     helper = counter_class.AngleCounter
     mp_drawing = mp.solutions.drawing_utils
@@ -15,7 +16,7 @@ def all_track(filename):
         cap = cv2.VideoCapture(filename)
         while cap.isOpened():
             ret, frame = cap.read()
-            if ret == True:
+            if ret:
                 image = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                 image.flags.writeable = False
 
@@ -28,40 +29,39 @@ def all_track(filename):
                     landmarks = results.pose_landmarks.landmark
 
                     knee_left = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
-                                landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+                                 landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
 
                     hip_left = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
-                            landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+                                landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
 
                     ankle_left = [landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,
-                            landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y]
+                                  landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y]
 
                     knee_right = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
-                                landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+                                  landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
 
                     hip_right = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
-                            landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+                                 landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
 
                     ankle_right = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,
-                            landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y]
+                                   landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y]
                     
                     shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
                                 landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
 
                     elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
-                            landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                             landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
 
                     wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
-                            landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
-
+                             landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
 
                     angle_knee_left = helper.calculate_angle(hip_left,
-                                                        knee_left,
-                                                        ankle_left)
+                                                             knee_left,
+                                                             ankle_left)
                     
                     angle_knee_right = helper.calculate_angle(hip_right,
-                                                        knee_right,
-                                                        ankle_right)
+                                                              knee_right,
+                                                              ankle_right)
                     
                     if angle_knee_left > 160 and angle_knee_right > 160:
                         stage_knee = 'down'
@@ -71,18 +71,16 @@ def all_track(filename):
                         stage_knee = 'up'
                         counter_sq += 1
 
-                    angle_wrist = helper.calculate_angle(shoulder,elbow,wrist)
+                    angle_wrist = helper.calculate_angle(shoulder, elbow, wrist)
 
                     if angle_wrist > 160:
                         stage_push = 'down'
                         startp = shoulder[0]
                         
-                    if angle_wrist < 100 and stage_push == 'down' and shoulder[0] <= startp - 0.05:
-                        
+                    if angle_wrist < 100 and stage_push == 'down' and shoulder[0] <= startp - 0.01:
                         stage_push = 'up'
                         counter_push += 1
 
-                        
                 except:
                     pass
                 
